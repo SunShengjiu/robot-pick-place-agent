@@ -30,6 +30,9 @@ class SceneSnapshot:
     observed_at: float
     objects: tuple[SceneObject, ...]
     targets: tuple[SceneObject, ...] = ()
+    # Identifies how poses were obtained. This is intentionally explicit so a
+    # simulator state read cannot be mistaken for camera perception.
+    observation_source: str = "unknown"
 
 
 @dataclass(frozen=True)

@@ -16,6 +16,17 @@ PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main simulate
 PYTHONPATH=src python3 examples/mujoco_pick_place.py
 ```
 
+两种观测模式必须显式选择：
+
+```bash
+# 控制调试：读取 MuJoCo body 位姿
+PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main simulate --observation state
+# 感知试验：只读取渲染 RGB 并做颜色检测
+PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main simulate --observation camera
+```
+
+`state` 的场景来源是 `mujoco_sim_state`，允许输出 `cube_position` 并用于抬升/落点判定；`camera` 的来源是 `mujoco_camera_rgb`，只能从像素得到对象估计，结果不会包含模拟器直接提供的物体位姿，当前也不会声称已完成深度/抬升判定。
+
 `mujoco` 未安装时，核心和 mock 模式仍可运行，`simulate` 会返回安装提示。仿真结果只验证该简化夹爪和固定场景的物理闭环，不能替代 PiPER、真实夹爪或现场标定验收。
 
 仓库没有复制 PiPER 厂商模型资产。`MujocoRobot` 支持 `xml_path` 加载外部 MJCF；接入真实 PiPER 模型前，需要把模型中的末端、左右夹指关节和方块/盒子 body 名称映射到适配器，再运行同一组判据。当前 CLI 的 `--xml` 参数会明确提示这个映射尚未完成，不会误把未知模型当作已验证。

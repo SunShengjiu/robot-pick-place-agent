@@ -16,6 +16,7 @@ MODEL_XML = r"""
   <default><geom contype="1" conaffinity="1" condim="3" margin="0" gap="0" solref="0.002 1" solimp="0.95 0.99 0.001" friction="5.0 0.5 0.1"/></default>
   <worldbody>
     <geom name="table" type="plane" pos="0 0 0" size="0.7 0.55 0.01" rgba="0.35 0.25 0.15 1"/>
+    <camera name="overhead" pos="0 0 2.00" mode="targetbody" target="cube" fovy="1.57"/>
     <body name="cube" pos="0.30 0.05 0.07">
       <freejoint/><geom name="cube_geom" type="box" size="0.035 0.035 0.035" mass="0.08" rgba="0.9 0.1 0.1 1"/>
     </body>
@@ -102,6 +103,14 @@ class MujocoRobot:
             joints.append({"name": name, "axis": tuple(float(v) for v in joint.axis), "range": tuple(float(v) for v in joint.range)})
         return {"joints": joints, "gripper_opening_limits_m": [0.0, 0.10]}
 
+    def render_camera(self, width: int = 320, height: int = 240):
+        """Render RGB pixels only; this does not expose simulator object poses."""
+        renderer = self.mujoco.Renderer(self.model, height=height, width=width)
+        renderer.update_scene(self.data, camera="overhead")
+        image = renderer.render()
+        renderer.close()
+        return image
+
     def get_state(self) -> dict:
         cube = self.data.body("cube").xpos.copy()
         return {"cube_position": tuple(float(v) for v in cube), "time": float(self.data.time), "held_object": self.held_object}
@@ -114,30 +123,95 @@ class MujocoRobot:
         return bool(0.42 < x < 0.58 and -0.03 < y < 0.13 and 0.03 < z < 0.16)
 
 
-def run_physics_pick_place(start: tuple[float, float] = (0.30, 0.05)) -> dict:
+class MujocoCameraObserver:
+    """Camera-only observer using rendered RGB and fixed tabletop calibration."""
+
+    def __init__(self, robot: MujocoRobot):
+        self.robot = robot
+
+    def observe(self):
+        import time
+        import numpy as np
+        from robot_pick_place_agent.core.models import SceneObject, SceneSnapshot
+
+        image = self.robot.render_camera()
+        red = (image[:, :, 0] > 60) & (image[:, :, 0] > image[:, :, 1] * 1.3) & (image[:, :, 0] > image[:, :, 2] * 1.3)
+        blue = (image[:, :, 2] > 25) & (image[:, :, 2] >= image[:, :, 0] * 0.5)
+
+        def centroid(mask):
+            ys, xs = np.where(mask)
+            return (float(xs.mean()), float(ys.mean()), int(len(xs))) if len(xs) else None
+
+        red_c, blue_c = centroid(red), centroid(blue)
+        if not red_c or not blue_c:
+            raise RuntimeError("仿真相机未检测到红色方块或蓝色盒子")
+
+        def image_to_table(c):
+            # Calibration for the fixed orthographic overhead camera.
+            u, v, _ = c
+            return Pose("base", 0.70 * u / image.shape[1] - 0.10, 0.70 * (1.0 - v / image.shape[0]) - 0.35, 0.035)
+
+        return SceneSnapshot(
+            scene_id="mujoco-camera-scene",
+            observed_at=time.time(),
+            objects=(SceneObject("red-block", "方块", "红色", image_to_table(red_c)),),
+            targets=(SceneObject("blue-box", "盒子", "蓝色", image_to_table(blue_c), .08),),
+            observation_source="mujoco_camera_rgb",
+        )
+
+
+class MujocoStateObserver:
+    """State observer: explicitly reads MuJoCo body poses for controller tuning."""
+
+    def __init__(self, robot: MujocoRobot):
+        self.robot = robot
+
+    def observe(self):
+        import time
+        from robot_pick_place_agent.core.models import SceneObject, SceneSnapshot
+        cube = self.robot.data.body("cube").xpos
+        target = self.robot.data.body("bin").xpos
+        return SceneSnapshot(
+            scene_id="mujoco-state-scene", observed_at=time.time(),
+            objects=(SceneObject("red-block", "方块", "红色", Pose("base", *[float(v) for v in cube])),),
+            targets=(SceneObject("blue-box", "盒子", "蓝色", Pose("base", *[float(v) for v in target]), .08),),
+            observation_source="mujoco_sim_state",
+        )
+
+
+def run_physics_pick_place(start: tuple[float, float] = (0.30, 0.05), observation_mode: str = "state") -> dict:
     """Execute the fixed red-cube to blue-bin scenario and return evidence."""
+    if observation_mode not in {"state", "camera"}:
+        raise ValueError("observation_mode 必须是 state 或 camera")
     robot = MujocoRobot()
     # The free cube starts on the table; only the mocap gripper is commanded.
     robot.data.qpos[0:3] = [start[0], start[1], .07]
     robot.data.qpos[3:7] = [1.0, 0.0, 0.0, 0.0]
     robot.data.qvel[:] = 0.0
     robot.mujoco.mj_forward(robot.model, robot.data)
-    robot.move_to(Pose("base", start[0], start[1], .16))
+    observer = MujocoStateObserver(robot) if observation_mode == "state" else MujocoCameraObserver(robot)
+    observed_scene = observer.observe()
+    source_pose = next(o.pose for o in observed_scene.objects if o.object_id == "red-block")
+    target_pose = next(o.pose for o in observed_scene.targets if o.object_id == "blue-box")
+    robot.move_to(Pose("base", source_pose.x, source_pose.y, .16))
     robot.set_gripper(.10)
-    robot.move_to(Pose("base", start[0], start[1], .13))
+    robot.move_to(Pose("base", source_pose.x, source_pose.y, .13))
     robot.set_gripper(.0)
     grasped = robot.grasp()
     if grasped:
         robot.held_object = "red-block"
-    before_lift = robot.get_state()["cube_position"]
-    robot.move_to(Pose("base", start[0], start[1], .24))
-    after_lift = robot.get_state()["cube_position"]
-    lifted = after_lift[2] > before_lift[2] + .03
-    robot.move_to(Pose("base", .50, .05, .20))
-    robot.move_to(Pose("base", .50, .05, .15))
+    if observation_mode == "state":
+        before_lift = observer.observe().objects[0].pose.z
+    robot.move_to(Pose("base", source_pose.x, source_pose.y, .24))
+    lifted = None
+    if observation_mode == "state":
+        lifted = observer.observe().objects[0].pose.z > before_lift + .03
+    robot.move_to(Pose("base", target_pose.x, target_pose.y, .20))
+    robot.move_to(Pose("base", target_pose.x, target_pose.y, .15))
     robot.release()
     robot.held_object = None
     robot._step(0.5)
-    state = robot.get_state()
-    state.update({"grasp_contact": bool(grasped), "lifted": bool(lifted), "success": bool(grasped and lifted and robot.verify_in_bin()), "diagnostics": robot.diagnostics()})
+    state = robot.get_state() if observation_mode == "state" else {"time": float(robot.data.time)}
+    in_bin = robot.verify_in_bin() if observation_mode == "state" else None
+    state.update({"observation_mode": observation_mode, "observation_source": observed_scene.observation_source, "grasp_contact": bool(grasped), "lifted": lifted, "in_bin": in_bin, "success": bool(grasped and lifted and in_bin) if observation_mode == "state" else False, "diagnostics": robot.diagnostics()})
     return state

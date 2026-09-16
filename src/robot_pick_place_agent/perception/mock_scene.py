@@ -8,4 +8,5 @@ class MockSceneProvider:
             scene_id="mock-scene-1", observed_at=time.time(),
             objects=(SceneObject("red-block", "方块", "红色", Pose("base", .30, .05, .03)),),
             targets=(SceneObject("blue-box", "盒子", "蓝色", Pose("base", .50, .05, .02), .08),),
+            observation_source="mock_fixture",
         )
