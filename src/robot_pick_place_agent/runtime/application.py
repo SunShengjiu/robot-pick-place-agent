@@ -25,7 +25,11 @@ class Application:
             result = ActionResult("task-1", ActionStatus.FAILED, "plan", f"规划响应无效：{exc}", {"execution_mode": self.execution_mode})
             return result
         if plan.clarification:
-            return ActionResult("task-1", ActionStatus.FAILED, "plan", plan.clarification, {"policy_source": plan.policy_source})
+            evidence = {"policy_source": plan.policy_source, "execution_mode": self.execution_mode}
+            if self.execution_mode == "mock":
+                evidence["result_scope"] = "mock_flow"
+                evidence["physical_success_confirmed"] = False
+            return ActionResult("task-1", ActionStatus.FAILED, "plan", plan.clarification, evidence)
         result = pick_and_place(self.robot, scene, plan.intent, evidence_policy=plan.policy_source)
         evidence = dict(result.evidence)
         evidence["execution_mode"] = self.execution_mode
