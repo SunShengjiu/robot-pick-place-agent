@@ -46,6 +46,8 @@ python3 -m pip install -e '.[simulation]'  # 需要 MuJoCo 时
 PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main simulate
 ```
 
+第一轮正确性约定：`run` 的退出码为 `0=succeeded`、`1=failed`、`2=uncertain`；规划不明确、否定或不支持的指令不会调用机器人。结果 JSON 会区分 `mock_flow` 与设备反馈，Mock 流程成功不代表物理抓放成功。
+
 MuJoCo 仿真会返回关节方向/限位、接触、抬升和最终落点证据。只有方块由接触夹持并抬离桌面后，`success` 才会为真；固定绑定或直接改写方块位姿不计入验证。
 
 初期只建立有实际内容的模块；完整目录规划见架构文档。

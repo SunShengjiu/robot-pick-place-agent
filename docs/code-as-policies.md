@@ -17,3 +17,5 @@ PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main plan "把红色方块�
 ```
 
 执行任务时，`run` 复用同一个 planner；规划来源会写入结果的 `policy_source` 字段。
+
+任务 CLI 返回码为：`0` 表示 succeeded，`1` 表示 failed，`2` 表示 uncertain。规划失败不会调用机器人；模拟执行结果会在 evidence 中标记 `execution_mode: "mock"`。

@@ -1,6 +1,7 @@
 import argparse
 import json
 from dataclasses import asdict
+from robot_pick_place_agent.core.models import ActionStatus
 from robot_pick_place_agent.runtime.application import Application
 
 
@@ -16,16 +17,26 @@ def main(argv=None):
     if args.command == "observe":
         print(json.dumps(asdict(app.observe()), ensure_ascii=False, default=str, indent=2))
     elif args.command == "plan":
-        print(json.dumps(asdict(app.plan(args.instruction)), ensure_ascii=False, default=str, indent=2))
+        try:
+            plan_result = app.plan(args.instruction)
+            print(json.dumps(asdict(plan_result), ensure_ascii=False, default=str, indent=2))
+            return 0 if plan_result.clarification is None else 1
+        except Exception as exc:
+            print(json.dumps({"status": "failed", "stage": "plan", "message": str(exc)}, ensure_ascii=False, indent=2))
+            return 1
     elif args.command == "run":
-        print(json.dumps(asdict(app.run(args.instruction)), ensure_ascii=False, default=str, indent=2))
+        result = app.run(args.instruction)
+        print(json.dumps(asdict(result), ensure_ascii=False, default=str, indent=2))
+        return {ActionStatus.SUCCEEDED: 0, ActionStatus.FAILED: 1, ActionStatus.UNCERTAIN: 2}[result.status]
     else:
         try:
-            print(json.dumps(app.simulate(args.instruction, xml_path=args.xml, observation_mode=args.observation), ensure_ascii=False, indent=2))
+            result = app.simulate(args.instruction, xml_path=args.xml, observation_mode=args.observation)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0 if result.get("success") else 1
         except RuntimeError as exc:
             parser.error(str(exc))
     return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

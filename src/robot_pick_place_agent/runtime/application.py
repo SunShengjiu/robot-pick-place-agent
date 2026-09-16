@@ -1,13 +1,15 @@
 from robot_pick_place_agent.adapters.robots.mock import MockRobot
 from robot_pick_place_agent.perception.mock_scene import MockSceneProvider
 from robot_pick_place_agent.skills.pick_place import pick_and_place
+from dataclasses import replace
 from robot_pick_place_agent.core.models import TaskIntent
-from robot_pick_place_agent.agent.planner import CodeAsPoliciesPlanner
+from robot_pick_place_agent.agent.planner import CodeAsPoliciesPlanner, PlanningError
 from robot_pick_place_agent.core.models import ActionResult, ActionStatus
 
 
 class Application:
     def __init__(self, robot=None, scene_provider=None, planner=None):
+        self.execution_mode = "mock" if robot is None or isinstance(robot, MockRobot) else "backend"
         self.robot = robot or MockRobot()
         self.scene_provider = scene_provider or MockSceneProvider()
         self.planner = planner or CodeAsPoliciesPlanner()
@@ -17,10 +19,21 @@ class Application:
 
     def run(self, instruction: str):
         scene = self.observe()
-        plan = self.planner.plan(instruction, scene)
+        try:
+            plan = self.planner.plan(instruction, scene)
+        except (PlanningError, ValueError, TypeError) as exc:
+            result = ActionResult("task-1", ActionStatus.FAILED, "plan", f"规划响应无效：{exc}", {"execution_mode": self.execution_mode})
+            return result
         if plan.clarification:
             return ActionResult("task-1", ActionStatus.FAILED, "plan", plan.clarification, {"policy_source": plan.policy_source})
-        return pick_and_place(self.robot, scene, plan.intent, evidence_policy=plan.policy_source)
+        result = pick_and_place(self.robot, scene, plan.intent, evidence_policy=plan.policy_source)
+        evidence = dict(result.evidence)
+        evidence["execution_mode"] = self.execution_mode
+        if self.execution_mode == "mock":
+            evidence["result_scope"] = "mock_flow"
+            evidence["physical_success_confirmed"] = False
+            result = replace(result, message="已完成模拟流程（不代表物理抓放成功）") if result.status is ActionStatus.SUCCEEDED else result
+        return replace(result, evidence=evidence)
 
     def plan(self, instruction: str):
         return self.planner.plan(instruction, self.observe())
