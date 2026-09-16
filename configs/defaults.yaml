@@ -1,0 +1,7 @@
+mode: mock
+robot:
+  name: mock-piper
+  workspace_frame: base
+task:
+  timeout_seconds: 30
+  max_retries: 1

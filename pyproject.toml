@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "robot-pick-place-agent"
+version = "0.1.0"
+description = "Modular natural-language robot pick and place runtime"
+requires-python = ">=3.10"
+dependencies = ["PyYAML>=6.0"]
+
+[project.optional-dependencies]
+simulation = ["mujoco>=3.2,<4"]
+
+[project.scripts]
+robot-agent = "robot_pick_place_agent.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

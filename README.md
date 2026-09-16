@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-项目处于架构设计阶段，已确定模块边界与实施顺序。尚未实现可运行的 CLI、模型集成或真机抓放，文档中的目录和命令属于计划接口。
+项目已包含可运行的 mock CLI，并提供可选 MuJoCo 物理验证闭环；模型集成、ROS/PiPER 真机抓放仍在后续阶段。
 
 ## 首个部署目标
 
@@ -35,6 +35,17 @@
 3. D435i、相机标定、检测和视觉抓放。
 4. 模型 API、高层工具调用和真实结果检查。
 5. 异常处理、批量测试与可复现部署说明。
+
+## 本地运行
+
+```bash
+PYTHONPATH=src python3 -m pytest -q
+PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main run "把红色方块放进蓝色盒子"
+python3 -m pip install -e '.[simulation]'  # 需要 MuJoCo 时
+PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main simulate
+```
+
+MuJoCo 仿真会返回关节方向/限位、接触、抬升和最终落点证据。只有方块由接触夹持并抬离桌面后，`success` 才会为真；固定绑定或直接改写方块位姿不计入验证。
 
 初期只建立有实际内容的模块；完整目录规划见架构文档。
 
