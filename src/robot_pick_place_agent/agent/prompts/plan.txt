@@ -1,0 +1,5 @@
+Code as Policies planning contract
+
+Decompose a natural-language instruction into exactly one finite tool call.
+Use only IDs present in the supplied scene. Return JSON and never emit Python,
+joint trajectories, simulator calls, or arbitrary code.

@@ -41,6 +41,7 @@
 ```bash
 PYTHONPATH=src python3 -m pytest -q
 PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main run "把红色方块放进蓝色盒子"
+PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main plan "把红色方块放进蓝色盒子"
 python3 -m pip install -e '.[simulation]'  # 需要 MuJoCo 时
 PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main simulate
 ```

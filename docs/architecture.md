@@ -104,6 +104,7 @@ CLI → runtime → agent / perception / skills → core
 - `core` 不导入 ROS、PiPER SDK、Torch 或任何模型 API SDK。
 - `skills` 只依赖核心接口，不写 PiPER 话题名、相机参数或模型名。
 - `agent` 只读场景快照、提出合法工具调用，不直接发送关节命令。
+- `agent.planner` 可采用 Code as Policies 风格的任务分解，但模型只能返回经过校验的有限工具调用；不执行生成的 Python、关节命令或任意模拟器代码。
 - `adapters` 负责第三方数据到核心数据的转换，包含单位、坐标系和异常映射。
 - `runtime` 根据配置显式组装实例，第一版不用动态扫描插件或自动注册。
 - `cli` 只处理参数和展示，不复制抓放业务逻辑。

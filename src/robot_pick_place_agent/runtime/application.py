@@ -2,20 +2,28 @@ from robot_pick_place_agent.adapters.robots.mock import MockRobot
 from robot_pick_place_agent.perception.mock_scene import MockSceneProvider
 from robot_pick_place_agent.skills.pick_place import pick_and_place
 from robot_pick_place_agent.core.models import TaskIntent
+from robot_pick_place_agent.agent.planner import CodeAsPoliciesPlanner
+from robot_pick_place_agent.core.models import ActionResult, ActionStatus
 
 
 class Application:
-    def __init__(self, robot=None, scene_provider=None):
+    def __init__(self, robot=None, scene_provider=None, planner=None):
         self.robot = robot or MockRobot()
         self.scene_provider = scene_provider or MockSceneProvider()
+        self.planner = planner or CodeAsPoliciesPlanner()
 
     def observe(self):
         return self.scene_provider.observe()
 
     def run(self, instruction: str):
         scene = self.observe()
-        intent = TaskIntent(instruction, "red-block", "blue-box", scene.scene_id)
-        return pick_and_place(self.robot, scene, intent)
+        plan = self.planner.plan(instruction, scene)
+        if plan.clarification:
+            return ActionResult("task-1", ActionStatus.FAILED, "plan", plan.clarification, {"policy_source": plan.policy_source})
+        return pick_and_place(self.robot, scene, plan.intent, evidence_policy=plan.policy_source)
+
+    def plan(self, instruction: str):
+        return self.planner.plan(instruction, self.observe())
 
     def simulate(self, instruction: str, start=(0.30, 0.05), xml_path=None, observation_mode="state"):
         """Run the same high-level instruction through the optional physics adapter."""
