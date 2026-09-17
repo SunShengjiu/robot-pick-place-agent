@@ -106,11 +106,11 @@ def test_m1_full_dynamic_sequence_and_rejections(tmp_path):
     assert not result["cap_api_used"]
 
 
-def test_unsupported_cartesian_and_cancel_do_not_teleport():
+def test_invalid_cartesian_frame_and_cancel_do_not_teleport():
     robot = PiperMujocoRobot()
     before = robot.data.qpos.copy()
     assert not robot.move_to(Pose("base", .3, .1, .2))
     robot.cancel()
     np.testing.assert_array_equal(before, robot.data.qpos)
     assert robot.data.time == 0
-    assert not robot.get_state()["capabilities"]["cartesian_motion"]
+    assert robot.get_state()["capabilities"]["cartesian_motion"]

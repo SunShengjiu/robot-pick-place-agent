@@ -1,8 +1,8 @@
 # robot-pick-place-agent：仓库结构设计
 
 本文定义项目的目标结构与接口边界，下列目录中部分仍是演进目标。
-当前已有 CLI 和完整 PiPER MuJoCo M1 后端，状态见 [M1 报告](piper-m1.md)；真机控制尚未接入。
-里程碑顺序为 M1 整臂关节控制 → M2 state 物理抓放 → M3 实际模型 API＋CaP → M4 相机与真机适配。
+当前已有 CLI 和完整 PiPER MuJoCo M1/M2a 后端，状态见 [M1 报告](piper-m1.md) 与 [M2a 报告](piper-m2a.md)；真机控制尚未接入。
+里程碑顺序为 M1 整臂关节控制 → M2a TCP IK/避碰 → M2 state 物理抓放 → M3 实际模型 API＋CaP → M4 相机与真机适配。
 
 ## 1. 目标和边界
 

@@ -4,13 +4,14 @@
 
 ## 当前状态
 
-当前主演示为 **M1：完整 PiPER 六轴机械臂＋末端夹爪的 MuJoCo 运动验收**。
+当前主演示为 **M2a：完整 PiPER 的 TCP 位姿 IK、连续关节轨迹和碰撞预检**；
+M1 的逐关节/夹爪运动验收仍保留。
 已接入官方 humble 固定版本模型，完成逐关节运动、返回指定姿态、夹爪开合。
-模型按当前 URDF 适配，具体硬件/固件匹配仍待确认。IK、整臂物理抓放、实际模型 API＋CaP、相机与真机迁移尚未完成。
+M2a 已用三个目标的实际 TCP 反馈验证位置和朝向。模型按当前 URDF 适配，具体硬件/固件匹配仍待确认。整臂物理抓放、实际模型 API＋CaP、相机与真机迁移尚未完成。
 
 [完整机械臂截图](artifacts/piper_m1/home_hold.png) ·
 [连续运动视频](artifacts/piper_m1/piper_m1_continuous.mp4) ·
-[M1 核对报告与关节映射](docs/piper-m1.md) · [来源与版本](UPSTREAM.md)
+[M1 核对报告与关节映射](docs/piper-m1.md) · [M2a IK 证据](docs/piper-m2a.md) · [来源与版本](UPSTREAM.md)
 
 ## 首个部署目标
 
@@ -37,9 +38,10 @@
 ## 实施顺序
 
 1. M1：官方 PiPER＋夹爪模型、逐关节与开合验收（已完成仿真验证）。
-2. M2：已知 state 坐标下整臂 IK、避碰和物理抓放，记录成功/失败证据。
-3. M3：实际模型 API＋CaP，通过受控技能接口驱动同一 PiPER 流程。
-4. M4：相机观测、PiPER ROS 2 / D435i 适配与现场标定验收。
+2. M2a：TCP 位姿 IK、连续关节轨迹、限位和碰撞预检（已完成仿真验证）。
+3. M2：已知 state 坐标下整臂物理抓放，记录成功/失败证据。
+4. M3：实际模型 API＋CaP，通过受控技能接口驱动同一 PiPER 流程。
+5. M4：相机观测、PiPER ROS 2 / D435i 适配与现场标定验收。
 
 ## 本地运行
 
@@ -48,6 +50,7 @@ python3 -m pip install --user 'setuptools>=68'
 python3 -m pip install -e '.[simulation-media]'
 MUJOCO_GL=egl robot-agent piper-m1  # 生成完整机械臂视频，需要 ffmpeg
 robot-agent piper-m1 --no-video --output artifacts/piper_m1_headless
+MUJOCO_GL=egl robot-agent piper-m2a  # 三个 TCP 位姿 IK 与碰撞证据
 PYTHONPATH=src python3 -m pytest -q
 ```
 
@@ -61,7 +64,7 @@ PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main simulate  # 旧简化�
 
 第一轮正确性约定：`run` 的退出码为 `0=succeeded`、`1=failed`、`2=uncertain`；规划不明确、否定或不支持的指令不会调用机器人。结果 JSON 会区分 `mock_flow` 与设备反馈，Mock 流程成功不代表物理抓放成功。
 
-PiPER M1 返回明确的里程碑范围和关节执行证据，不声称抓放或 CaP 成功。
+PiPER M1/M2a 返回明确的里程碑范围和关节/TCP 执行证据，不声称抓放或 CaP 成功。
 后续 M2 最终成功必须同时验证夹持、持续抬升、运输、释放、夹爪撤离和物体稳定落入容器；固定绑定或执行中改写物体位姿不计入验证。
 
 初期只建立有实际内容的模块；完整目录规划见架构文档。

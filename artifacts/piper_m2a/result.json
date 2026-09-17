@@ -1,0 +1,276 @@
+{
+  "milestone": "M2a",
+  "passed": true,
+  "error": null,
+  "scope": "tcp_ik_trajectory_and_collision_checks_only",
+  "observation_source": "mujoco_sim_state",
+  "physical_pick_place_verified": false,
+  "cap_api_used": false,
+  "tcp_definition": {
+    "parent": "link6",
+    "position_m": [
+      0.0,
+      0.0,
+      0.125
+    ],
+    "orientation": "link6 frame",
+    "calibrated": false
+  },
+  "targets": [
+    {
+      "index": 1,
+      "target_pose": {
+        "frame_id": "base",
+        "x": 0.30995360871716937,
+        "y": 0.052247273785261644,
+        "z": 0.3310603147509186,
+        "qx": 0.011089211672151761,
+        "qy": 0.79318981289231,
+        "qz": 0.11471571620873747,
+        "qw": 0.5979692756012387
+      },
+      "ik_solution": {
+        "positions_rad": [
+          0.1505313348427364,
+          0.8999658440115703,
+          -0.800008533847622,
+          0.09759010281719747,
+          0.249984821351527,
+          0.10248250911985896
+        ],
+        "iterations": 4,
+        "position_error_m": 3.966564272218216e-05,
+        "orientation_error_rad": 8.220924565565776e-05
+      },
+      "collision_precheck": {
+        "valid": true,
+        "reason": "clear",
+        "samples_checked": 121,
+        "max_penetration_m": 0.0
+      },
+      "executed": true,
+      "actual_tcp_pose": {
+        "frame_id": "base",
+        "x": 0.3099392426999381,
+        "y": 0.05228403110389675,
+        "z": 0.33106573853276927,
+        "qx": 0.01111758393564342,
+        "qy": 0.7931899788787118,
+        "qz": 0.1146867314329059,
+        "qw": 0.5979740883742871
+      },
+      "position_error_m": 3.9835917635906254e-05,
+      "orientation_error_rad": 8.168948275190817e-05,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 1.2531925124015242e-06,
+        "finger_error_m": 3.2836387012236123e-09,
+        "duration_s": 1.283,
+        "peak_penetration_m": 0.0,
+        "ik_iterations": 4,
+        "ik_position_error_m": 3.966564272218216e-05,
+        "ik_orientation_error_rad": 8.220924565565776e-05,
+        "target_pose": {
+          "frame_id": "base",
+          "x": 0.30995360871716937,
+          "y": 0.052247273785261644,
+          "z": 0.3310603147509186,
+          "qx": 0.011089211672151761,
+          "qy": 0.79318981289231,
+          "qz": 0.11471571620873747,
+          "qw": 0.5979692756012387
+        }
+      }
+    },
+    {
+      "index": 2,
+      "target_pose": {
+        "frame_id": "base",
+        "x": 0.3205259920779583,
+        "y": -0.0735523920950055,
+        "z": 0.3139577552132774,
+        "qx": -0.006972504964378001,
+        "qy": 0.8363999107479104,
+        "qz": -0.13600165292819733,
+        "qw": 0.5309332574591733
+      },
+      "ik_solution": {
+        "positions_rad": [
+          -0.20052576760691465,
+          1.0000014685943857,
+          -0.9001252585717772,
+          -0.09860518079107888,
+          0.40002178527738413,
+          -0.15151065337311925
+        ],
+        "iterations": 8,
+        "position_error_m": 6.90843558601842e-05,
+        "orientation_error_rad": 7.29851948456975e-05
+      },
+      "collision_precheck": {
+        "valid": true,
+        "reason": "clear",
+        "samples_checked": 121,
+        "max_penetration_m": 0.0
+      },
+      "executed": true,
+      "actual_tcp_pose": {
+        "frame_id": "base",
+        "x": 0.3205170322263693,
+        "y": -0.07360830159220279,
+        "z": 0.3139976342176177,
+        "qx": -0.0069928022989040415,
+        "qy": 0.8363878390364899,
+        "qz": -0.13598597382084793,
+        "qw": 0.5309560229923717
+      },
+      "position_error_m": 6.925666613782676e-05,
+      "orientation_error_rad": 7.271346264273999e-05,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 4.7172980871534875e-07,
+        "finger_error_m": 2.5659817812218044e-09,
+        "duration_s": 1.774,
+        "peak_penetration_m": 0.0,
+        "ik_iterations": 8,
+        "ik_position_error_m": 6.90843558601842e-05,
+        "ik_orientation_error_rad": 7.29851948456975e-05,
+        "target_pose": {
+          "frame_id": "base",
+          "x": 0.3205259920779583,
+          "y": -0.0735523920950055,
+          "z": 0.3139577552132774,
+          "qx": -0.006972504964378001,
+          "qy": 0.8363999107479104,
+          "qz": -0.13600165292819733,
+          "qw": 0.5309332574591733
+        }
+      }
+    },
+    {
+      "index": 3,
+      "target_pose": {
+        "frame_id": "base",
+        "x": 0.27769135253985316,
+        "y": 0.03644579294375255,
+        "z": 0.2946135350567825,
+        "qx": 0.10497670504153644,
+        "qy": 0.785426470615219,
+        "qz": 0.16487474150226542,
+        "qw": 0.5872831261581637
+      },
+      "ik_solution": {
+        "positions_rad": [
+          0.09755916215789445,
+          0.7500317358825966,
+          -0.5999651789764159,
+          0.2119415567802812,
+          0.20042438954500993,
+          0.1876678282939889
+        ],
+        "iterations": 7,
+        "position_error_m": 0.0001620987566660834,
+        "orientation_error_rad": 5.584053697870069e-05
+      },
+      "collision_precheck": {
+        "valid": true,
+        "reason": "clear",
+        "samples_checked": 121,
+        "max_penetration_m": 0.0
+      },
+      "executed": true,
+      "actual_tcp_pose": {
+        "frame_id": "base",
+        "x": 0.2777151619069422,
+        "y": 0.036285742210014994,
+        "z": 0.2946067667371,
+        "qx": 0.10495930799390914,
+        "qy": 0.7854227745273572,
+        "qz": 0.16489637453016753,
+        "qw": 0.587285105026508
+      },
+      "position_error_m": 0.00016195349172658995,
+      "orientation_error_rad": 5.615058849168162e-05,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 7.595020665718266e-07,
+        "finger_error_m": 8.353485195233823e-10,
+        "duration_s": 1.75,
+        "peak_penetration_m": 0.0,
+        "ik_iterations": 7,
+        "ik_position_error_m": 0.0001620987566660834,
+        "ik_orientation_error_rad": 5.584053697870069e-05,
+        "target_pose": {
+          "frame_id": "base",
+          "x": 0.27769135253985316,
+          "y": 0.03644579294375255,
+          "z": 0.2946135350567825,
+          "qx": 0.10497670504153644,
+          "qy": 0.785426470615219,
+          "qz": 0.16487474150226542,
+          "qw": 0.5872831261581637
+        }
+      }
+    }
+  ],
+  "collision_rejection": {
+    "valid": false,
+    "reason": "collision",
+    "samples_checked": 35,
+    "first_collision": {
+      "t": 0.5666666666666667,
+      "valid": false,
+      "contacts": [
+        {
+          "geom1": "table",
+          "geom2": "link7_collision",
+          "penetration_m": 0.00980766064293919
+        },
+        {
+          "geom1": "table",
+          "geom2": "link7_collision",
+          "penetration_m": 0.008090747203637234
+        },
+        {
+          "geom1": "table",
+          "geom2": "link8_collision",
+          "penetration_m": 0.021889097614309745
+        },
+        {
+          "geom1": "table",
+          "geom2": "link8_collision",
+          "penetration_m": 0.021421906164838092
+        },
+        {
+          "geom1": "table",
+          "geom2": "link8_collision",
+          "penetration_m": 0.01196572786291978
+        },
+        {
+          "geom1": "table",
+          "geom2": "link8_collision",
+          "penetration_m": 0.01024883468285407
+        }
+      ],
+      "max_penetration_m": 0.021889097614309745
+    }
+  },
+  "unreachable_rejection": {
+    "accepted": false,
+    "execution": {
+      "status": "failed",
+      "reason": "ik_no_solution"
+    }
+  },
+  "trajectory": {
+    "samples": 6407,
+    "video_frames": 161,
+    "max_joint_step_rad": 0.0004640630687657611,
+    "max_penetration_m": 0.0,
+    "max_contact_count": 0
+  },
+  "mujoco_version": "3.13.0"
+}
