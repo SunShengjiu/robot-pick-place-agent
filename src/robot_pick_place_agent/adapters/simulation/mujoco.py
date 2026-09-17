@@ -136,7 +136,9 @@ class MujocoRobot:
 
     def get_state(self) -> dict:
         cube = self.data.body("cube").xpos.copy()
-        return {"cube_position": tuple(float(v) for v in cube), "time": float(self.data.time)}
+        return {"cube_position": tuple(float(v) for v in cube), "time": float(self.data.time),
+                "gripper_opening_m": self.gripper_opening_m,
+                "gripper_opening_limits_m": [0.0, 0.10]}
 
     def cancel(self) -> None:
         self.set_gripper(0.08)

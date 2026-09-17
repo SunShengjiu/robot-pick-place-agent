@@ -8,6 +8,8 @@ import pytest
 mujoco = pytest.importorskip("mujoco")
 import numpy as np
 
+from tools.vendor_piper import canonical_bytes
+
 from robot_pick_place_agent.adapters.simulation.piper import PiperMujocoRobot
 from robot_pick_place_agent.adapters.simulation.piper_m1 import run_m1
 from robot_pick_place_agent.adapters.simulation.piper_model import ASSETS, HOME, TCP_OFFSET
@@ -46,7 +48,8 @@ def urdf_fk(q):
 def test_pinned_assets_are_unchanged():
     manifest = json.loads((ASSETS / "source.json").read_text())
     for entry in manifest["files"]:
-        assert hashlib.sha256((ASSETS / entry["local"]).read_bytes()).hexdigest() == entry["sha256"]
+        data = (ASSETS / entry["local"]).read_bytes()
+        assert hashlib.sha256(canonical_bytes(data, entry["local"])).hexdigest() == entry["sha256"]
 
 
 @pytest.mark.parametrize("q", [np.zeros(8), np.array([*HOME, .035, -.035]), np.array([-.4, 1.2, -1.4, .6, -.5, .8, .02, -.02])])

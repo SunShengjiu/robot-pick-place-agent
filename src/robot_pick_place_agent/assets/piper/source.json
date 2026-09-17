@@ -7,82 +7,98 @@
     {
       "source": "LICENSE",
       "local": "upstream/LICENSE",
-      "sha256": "e32d78fd3761052ab0b2bb42fef8a7a9ad3f298d315d305333c349d2aff1f134"
+      "sha256": "e32d78fd3761052ab0b2bb42fef8a7a9ad3f298d315d305333c349d2aff1f134",
+      "hash_mode": "exact_bytes"
     },
     {
       "source": "README.MD",
       "local": "upstream/README.MD",
-      "sha256": "3465d4dcece7e9a6df7c11ec510b24c1d5430e5f556d666821be3ff3e5258fd5"
+      "sha256": "3465d4dcece7e9a6df7c11ec510b24c1d5430e5f556d666821be3ff3e5258fd5",
+      "hash_mode": "canonical_lf"
     },
     {
       "source": "src/piper_description/package.xml",
       "local": "upstream/package.xml",
-      "sha256": "307ddcda650974988726809436f3aeb63d19db55174ac5976d4869ddbd994177"
+      "sha256": "8cb2b8b05ed68dde6d63ea86fbbc46964d1ca49f32f5ba8c2668222620a22ae9",
+      "hash_mode": "canonical_lf"
     },
     {
       "source": "src/piper_description/mujoco_model/piper_description.xml",
       "local": "upstream/piper_description.xml",
-      "sha256": "3c2e4bf29dd7fc80acfbb056ad711548bdd57f5c26f2e0fcb43f179b8e02f726"
+      "sha256": "3c2e4bf29dd7fc80acfbb056ad711548bdd57f5c26f2e0fcb43f179b8e02f726",
+      "hash_mode": "canonical_lf"
     },
     {
       "source": "src/piper_description/urdf/piper_description.urdf",
       "local": "upstream/piper_description.urdf",
-      "sha256": "22c15f95e50003b01713bae158638f7d19cdb71b1bd1095289865b835067002b"
+      "sha256": "20150c19632119fb8a787e0acd8e287f7ad30bc856cccd1d0711572649f759ca",
+      "hash_mode": "canonical_lf"
     },
     {
       "source": "src/piper_description/urdf/piper_description_old.urdf",
       "local": "upstream/piper_description_old.urdf",
-      "sha256": "818656c69a7db8067db5cd4a65fa7d3d6ee66549899c5d67548626c21eaaf435"
+      "sha256": "b8a3bc2b75d552c1ed28a16d9fabb8a17c6ba01357bbbc0a7608dcd4230dbad7",
+      "hash_mode": "canonical_lf"
     },
     {
       "source": "src/piper_description/meshes/base_link.STL",
       "local": "meshes/base_link.STL",
-      "sha256": "fd4a3d6d0266205fe3f725f048645be66592c23564db22e08b0807d5569b2c64"
+      "sha256": "fd4a3d6d0266205fe3f725f048645be66592c23564db22e08b0807d5569b2c64",
+      "hash_mode": "exact_bytes"
     },
     {
       "source": "src/piper_description/meshes/gripper_base.STL",
       "local": "meshes/gripper_base.STL",
-      "sha256": "2895bfa6f1eef2d0ad2cb9dfdedd5f6c760ec07388bcde2b4d1e412e1189c9cb"
+      "sha256": "2895bfa6f1eef2d0ad2cb9dfdedd5f6c760ec07388bcde2b4d1e412e1189c9cb",
+      "hash_mode": "exact_bytes"
     },
     {
       "source": "src/piper_description/meshes/link1.STL",
       "local": "meshes/link1.STL",
-      "sha256": "9ee6e1d67c0241f42a0dbaf5c676d19230375ed078ee1943bb8c4c37ab303d14"
+      "sha256": "9ee6e1d67c0241f42a0dbaf5c676d19230375ed078ee1943bb8c4c37ab303d14",
+      "hash_mode": "exact_bytes"
     },
     {
       "source": "src/piper_description/meshes/link2.STL",
       "local": "meshes/link2.STL",
-      "sha256": "0d37675b699b643f2e15348de99aed535fac10dc5f09a79b8e4b0acfaf4e0378"
+      "sha256": "0d37675b699b643f2e15348de99aed535fac10dc5f09a79b8e4b0acfaf4e0378",
+      "hash_mode": "exact_bytes"
     },
     {
       "source": "src/piper_description/meshes/link3.STL",
       "local": "meshes/link3.STL",
-      "sha256": "e8ae51f17c0c7f6d67b753922e2cc269f5e8372a65734f859231639a64fe8fad"
+      "sha256": "e8ae51f17c0c7f6d67b753922e2cc269f5e8372a65734f859231639a64fe8fad",
+      "hash_mode": "exact_bytes"
     },
     {
       "source": "src/piper_description/meshes/link4.STL",
       "local": "meshes/link4.STL",
-      "sha256": "efa33022976218f246f736a6133494b5d0e5486e8b50b52900c42f285ae85558"
+      "sha256": "efa33022976218f246f736a6133494b5d0e5486e8b50b52900c42f285ae85558",
+      "hash_mode": "exact_bytes"
     },
     {
       "source": "src/piper_description/meshes/link5.STL",
       "local": "meshes/link5.STL",
-      "sha256": "a1c69d1c7f6f8c60e2c82331c0f444725200ed4053d3e5ec23aa82cb5db5b29f"
+      "sha256": "a1c69d1c7f6f8c60e2c82331c0f444725200ed4053d3e5ec23aa82cb5db5b29f",
+      "hash_mode": "exact_bytes"
     },
     {
       "source": "src/piper_description/meshes/link6.STL",
       "local": "meshes/link6.STL",
-      "sha256": "88374973bc3bd9e7389b5853cd6e555af9731c30b658b1ee6f85be34a126cb92"
+      "sha256": "88374973bc3bd9e7389b5853cd6e555af9731c30b658b1ee6f85be34a126cb92",
+      "hash_mode": "exact_bytes"
     },
     {
       "source": "src/piper_description/meshes/link7.STL",
       "local": "meshes/link7.STL",
-      "sha256": "475a7d8db056524d7659fadf5a2c307d62791047b6214d733dfc7846ed1c613d"
+      "sha256": "475a7d8db056524d7659fadf5a2c307d62791047b6214d733dfc7846ed1c613d",
+      "hash_mode": "exact_bytes"
     },
     {
       "source": "src/piper_description/meshes/link8.STL",
       "local": "meshes/link8.STL",
-      "sha256": "3f88d534a85e28a33ef7d2061adacbd1d25214aa9325f9e464aad0f9e4b74606"
+      "sha256": "3f88d534a85e28a33ef7d2061adacbd1d25214aa9325f9e464aad0f9e4b74606",
+      "hash_mode": "exact_bytes"
     }
   ]
 }

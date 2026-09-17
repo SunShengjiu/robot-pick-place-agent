@@ -157,6 +157,18 @@ PiPER MuJoCo / PiPER ROS 2；技能层不读写 MuJoCo。当前 state 数据明�
 - M1 专项测试 7 项通过。全仓回归 92 通过、1 失败：原有
   `test_physics_pick_place_from_second_start` 的简化漂浮夹爪未形成双侧接触；
   单独复现仍失败，该旧适配器未在本次修改，不作为 M1 的成功证据。
+  回归首次定位到 `9a51151`，详见[旧夹爪回归记录](legacy-gripper-regression.md)。
+
+## 补修规则
+
+后续技能释放开度从 `gripper_opening_limits_m` 读取；PiPER 使用 0–70 mm，
+Mock 设备使用自己的 0–80 mm 配置。没有合法设备配置时，技能不会把动作序列标为成功。
+释放成功还必须由设备提供 `placement_verified=true`、来源/目标身份以及目标位置误差或
+位置测量；只有 `held_object=null`、`holding=false` 或 `placement_verified=false`
+均会保持 `uncertain`，仍持有来源物体也会拒绝成功。
+
+`PiperMujocoRobot.cancel()` 使用线程安全取消请求；轨迹循环在每个物理步及保持阶段检查，
+中止时冻结于已积分状态并保留 `last_execution.status=cancelled`。新的运动命令开始新一代轨迹。
 
 `artifacts/piper_m1/result.json` 保存每条命令、起止时间、达标误差和拒绝原因；
 `joint_trace.csv` 每个 1 ms 物理步记录关节目标/位置/速度/努力、TCP、开度和碰撞；

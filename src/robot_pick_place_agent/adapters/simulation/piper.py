@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+import threading
 
 import mujoco
 import numpy as np
@@ -15,6 +16,7 @@ class PiperMujocoRobot:
     max_joint_speed_radps = 0.5
     max_joint_acceleration_radps2 = 1.0
     max_opening_speed_mps = 0.04
+    gripper_opening_limits_m = (0.0, 0.07)
 
     def __init__(self):
         self.xml = build_model_xml()
@@ -31,6 +33,7 @@ class PiperMujocoRobot:
         self.on_step = None
         self.phase = "initial"
         self.last_execution = {"status": "idle"}
+        self._cancel_requested = threading.Event()
         mujoco.mj_forward(self.model, self.data)
 
     def _step(self):
@@ -50,9 +53,25 @@ class PiperMujocoRobot:
             raise ValueError("Hold duration must be finite and nonnegative")
         self.target_velocity[:] = 0
         for _ in range(math.ceil(seconds / self.model.opt.timestep)):
+            if self._cancel_requested.is_set():
+                self._finish_cancelled()
+                return False
             self._step()
+            if self._cancel_requested.is_set():
+                self._finish_cancelled()
+                return False
+        return True
+
+    def _finish_cancelled(self):
+        """Freeze the trajectory at the integrated state and retain cancellation evidence."""
+        self.target = self.data.qpos[self._qadr].copy()
+        self.target_velocity[:] = 0
+        self.last_execution = {"status": "cancelled", "reason": "motion_cancelled",
+                               "time_s": float(self.data.time),
+                               "joint_positions_rad": self.data.qpos[self._qadr[:6]].tolist()}
 
     def _execute(self, target, minimum_duration=0.8):
+        self._cancel_requested.clear()
         start = self.data.qpos[self._qadr].copy()
         delta = target - start
         duration = max(minimum_duration, 1.875 * np.max(np.abs(delta[:6])) / self.max_joint_speed_radps,
@@ -62,17 +81,24 @@ class PiperMujocoRobot:
         duration = steps * self.model.opt.timestep
         peak_penetration = 0.0
         for step in range(1, steps + 1):
+            if self._cancel_requested.is_set():
+                self._finish_cancelled()
+                return False
             t = step / steps
             self.target = start + delta * (10 * t**3 - 15 * t**4 + 6 * t**5)
             self.target_velocity = delta * (30 * t**2 - 60 * t**3 + 30 * t**4) / duration
             self._step()
+            if self._cancel_requested.is_set():
+                self._finish_cancelled()
+                return False
             peak_penetration = max(peak_penetration, max((-c.dist for c in self.data.contact), default=0))
             if not np.isfinite(self.data.qpos).all() or peak_penetration > .002:
                 self.cancel()
                 self.last_execution = {"status": "failed", "reason": "collision_or_nonfinite_state", "peak_penetration_m": float(peak_penetration)}
                 return False
         self.target = target.copy()
-        self.hold(.35)
+        if not self.hold(.35):
+            return False
         peak_penetration = max(peak_penetration, max((-c.dist for c in self.data.contact), default=0))
         error = np.abs(self.data.qpos[self._qadr] - target)
         reached = bool(np.max(error[:6]) < .01 and np.max(error[6:]) < .0005
@@ -99,8 +125,9 @@ class PiperMujocoRobot:
         return self._execute(target)
 
     def set_gripper(self, opening_m: float) -> bool:
-        if not isinstance(opening_m, (int, float)) or not math.isfinite(opening_m) or not 0 <= opening_m <= .07:
-            self.last_execution = {"status": "rejected", "reason": "opening_m_must_be_in_0_to_0.07"}
+        low, high = self.gripper_opening_limits_m
+        if not isinstance(opening_m, (int, float)) or not math.isfinite(opening_m) or not low <= opening_m <= high:
+            self.last_execution = {"status": "rejected", "reason": f"opening_m_must_be_in_{low}_to_{high}"}
             return False
         target = self.target.copy()
         target[6:] = [opening_m / 2, -opening_m / 2]
@@ -111,10 +138,10 @@ class PiperMujocoRobot:
         return False
 
     def cancel(self) -> None:
-        """Hold measured joint position; no implied opening or hardware emergency stop."""
-        self.target = self.data.qpos[self._qadr].copy()
-        self.target_velocity[:] = 0
-        self.last_execution = {"status": "cancelled", "reason": "hold_current_joints"}
+        """Request cancellation; the active loop freezes at its next step boundary."""
+        self._cancel_requested.set()
+        self.last_execution = {"status": "cancelled", "reason": "motion_cancel_requested",
+                               "time_s": float(self.data.time)}
 
     def get_state(self) -> dict:
         quaternion = np.zeros(4)
@@ -124,6 +151,7 @@ class PiperMujocoRobot:
                 "time": float(self.data.time), "joint_names": list(self.arm_joint_names),
                 "joint_positions_rad": self.data.qpos[self._qadr[:6]].tolist(),
                 "gripper_opening_m": float(self.data.qpos[self._qadr[6]] - self.data.qpos[self._qadr[7]]),
+                "gripper_opening_limits_m": list(self.gripper_opening_limits_m),
                 "pose": Pose("base", *map(float, xyz), *map(float, quaternion[1:]), float(quaternion[0])),
                 "last_execution": dict(self.last_execution),
                 "capabilities": {"joint_motion": True, "gripper": True, "cartesian_motion": False, "physical_pick_place": False}}

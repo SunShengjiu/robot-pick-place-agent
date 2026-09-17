@@ -9,6 +9,8 @@
 - 结构、零位、质量惯量与限位依据：[当前带夹爪 URDF](https://github.com/agilexrobotics/piper_ros/blob/017ffefa64511bc6325bd77ddc4e16065c152051/src/piper_description/urdf/piper_description.urdf)
 - 资源：`src/robot_pick_place_agent/assets/piper/`，包括 10 个原始 STL、原始 MJCF、当前/旧版 URDF、README、package.xml、LICENSE。
 - 文件 SHA-256 与原路径：同目录 `source.json`；测试逐文件校验。
+- 文本资源使用规范化 LF 计算 SHA-256，二进制 STL 使用逐字节 SHA-256；工作树保留上游 blob 原始字节。
+  因此 Windows CRLF 不会改变期望哈希，二进制换行/内容变化仍会失败。
 - 上游根许可证 MIT（Copyright 2024 RosenYin），原文随资源保留；上游 description/package.xml 仍为 TODO 许可证声明，此差异已记录。
 
 没有修改上游资源字节。`piper_model.py` 在加载时使用 XML 结构化 API 生成适配模型；

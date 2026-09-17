@@ -8,6 +8,28 @@ import subprocess
 COMMIT = "017ffefa64511bc6325bd77ddc4e16065c152051"
 REPOSITORY = "https://github.com/agilexrobotics/piper_ros"
 DESTINATION = Path(__file__).resolve().parents[1] / "src/robot_pick_place_agent/assets/piper"
+TEXT_SUFFIXES = {".md", ".xml", ".urdf", ".xacro", ".yaml", ".yml", ".txt", ".json", ".py", ".sh"}
+
+
+def canonical_bytes(data: bytes, relative: str) -> bytes:
+    """Canonicalize text to LF; preserve binary resources byte-for-byte."""
+    if Path(relative).suffix.lower() in TEXT_SUFFIXES:
+        return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return data
+
+
+def verify_assets(root=DESTINATION):
+    """Verify resources without treating Windows text newlines as source changes."""
+    manifest = json.loads((Path(root) / "source.json").read_text(encoding="utf-8"))
+    failures = []
+    for entry in manifest["files"]:
+        path = Path(root) / entry["local"]
+        actual = hashlib.sha256(canonical_bytes(path.read_bytes(), entry["local"])).hexdigest()
+        if actual != entry["sha256"]:
+            failures.append({"local": entry["local"], "expected": entry["sha256"], "actual": actual})
+    if failures:
+        raise ValueError(json.dumps(failures, indent=2))
+    return True
 
 
 def vendor(checkout):
@@ -28,9 +50,14 @@ def vendor(checkout):
         data = subprocess.check_output(["git", "-C", str(checkout), "show", f"{COMMIT}:{source}"])
         target = DESTINATION / local
         target.parent.mkdir(parents=True, exist_ok=True)
+        # Keep the upstream blob bytes in the checkout. Verification hashes
+        # canonicalize text only, so Windows CRLF does not alter expectations.
         target.write_bytes(data)
-        manifest["files"].append({"source": source, "local": local, "sha256": hashlib.sha256(data).hexdigest()})
+        manifest["files"].append({"source": source, "local": local,
+                                    "sha256": hashlib.sha256(canonical_bytes(data, local)).hexdigest(),
+                                    "hash_mode": "canonical_lf" if Path(local).suffix.lower() in TEXT_SUFFIXES else "exact_bytes"})
     (DESTINATION / "source.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    verify_assets()
     print(f"Imported {len(files)} unchanged files from {COMMIT}")
 
 
