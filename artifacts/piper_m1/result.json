@@ -1,0 +1,432 @@
+{
+  "milestone": "M1",
+  "passed": true,
+  "error": null,
+  "scope": "full_piper_joint_commissioning_only",
+  "observation_source": "mujoco_sim_state",
+  "physical_pick_place_verified": false,
+  "cap_api_used": false,
+  "checks": {
+    "all_18_commands_completed": true,
+    "six_joints_individually_moved": true,
+    "base_fixed": true,
+    "joint_limits_respected": true,
+    "no_table_contact": true,
+    "no_penetration_above_1mm": true,
+    "invalid_commands_rejected": true,
+    "no_mocap_freejoint_or_weld": true,
+    "no_solver_warnings": true
+  },
+  "duration_s": 38.51400000000094,
+  "video_frames": 963,
+  "source_commit": "017ffefa64511bc6325bd77ddc4e16065c152051",
+  "mujoco_version": "3.13.0",
+  "python_version": "3.10.12",
+  "max_penetration_m": 5.830468822600125e-08,
+  "motions": [
+    {
+      "phase": "joint1_positive",
+      "start_s": 0.8000000000000006,
+      "end_s": 2.351999999999852,
+      "command": [
+        0.25,
+        0.8,
+        -0.7,
+        0.0,
+        0.3,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 5.118309542861965e-07,
+        "finger_error_m": 1.965442510132309e-09,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "joint1_return",
+      "start_s": 2.651999999999819,
+      "end_s": 4.203999999999739,
+      "command": [
+        0.0,
+        0.8,
+        -0.7,
+        0.0,
+        0.3,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 5.118311228714192e-07,
+        "finger_error_m": 1.962741004446489e-09,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "joint2_positive",
+      "start_s": 4.203999999999739,
+      "end_s": 5.756000000000257,
+      "command": [
+        0.0,
+        1.05,
+        -0.7,
+        0.0,
+        0.3,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 6.955956297627353e-07,
+        "finger_error_m": 7.507806876194678e-12,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "joint2_return",
+      "start_s": 6.056000000000357,
+      "end_s": 7.608000000000875,
+      "command": [
+        0.0,
+        0.8,
+        -0.7,
+        0.0,
+        0.3,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 6.960832168445563e-07,
+        "finger_error_m": 1.008108874156477e-11,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "joint3_positive",
+      "start_s": 7.608000000000875,
+      "end_s": 9.160000000000363,
+      "command": [
+        0.0,
+        0.8,
+        -0.44999999999999996,
+        0.0,
+        0.3,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 8.636411961693291e-07,
+        "finger_error_m": 2.8032368093455773e-12,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "joint3_return",
+      "start_s": 9.460000000000196,
+      "end_s": 11.011999999999336,
+      "command": [
+        0.0,
+        0.8,
+        -0.7,
+        0.0,
+        0.3,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 8.260405464644016e-07,
+        "finger_error_m": 6.941634766999272e-12,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "joint4_positive",
+      "start_s": 11.011999999999336,
+      "end_s": 12.563999999998476,
+      "command": [
+        0.0,
+        0.8,
+        -0.7,
+        0.25,
+        0.3,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 1.7523908235735857e-07,
+        "finger_error_m": 1.446706088259475e-10,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "joint4_return",
+      "start_s": 12.86399999999831,
+      "end_s": 14.41599999999745,
+      "command": [
+        0.0,
+        0.8,
+        -0.7,
+        0.0,
+        0.3,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 1.7517756303507533e-07,
+        "finger_error_m": 1.5854255408509488e-10,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "joint5_positive",
+      "start_s": 14.41599999999745,
+      "end_s": 15.96799999999659,
+      "command": [
+        0.0,
+        0.8,
+        -0.7,
+        0.0,
+        0.55,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 7.448275592958353e-07,
+        "finger_error_m": 2.6656038487615774e-12,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "joint5_return",
+      "start_s": 16.2679999999969,
+      "end_s": 17.819999999998796,
+      "command": [
+        0.0,
+        0.8,
+        -0.7,
+        0.0,
+        0.3,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 6.76593358561739e-07,
+        "finger_error_m": 2.293068512848606e-12,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "joint6_positive",
+      "start_s": 17.819999999998796,
+      "end_s": 19.372000000000693,
+      "command": [
+        0.0,
+        0.8,
+        -0.7,
+        0.0,
+        0.3,
+        0.25
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 1.9353432562096984e-07,
+        "finger_error_m": 3.48233247793317e-12,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "joint6_return",
+      "start_s": 19.67200000000106,
+      "end_s": 21.224000000002956,
+      "command": [
+        0.0,
+        0.8,
+        -0.7,
+        0.0,
+        0.3,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 1.935338410141148e-07,
+        "finger_error_m": 5.498372590562184e-12,
+        "duration_s": 1.552,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "specified_pose",
+      "start_s": 21.224000000002956,
+      "end_s": 22.99600000000512,
+      "command": [
+        0.35,
+        1.05,
+        -1.05,
+        0.25,
+        0.5,
+        -0.35
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 5.560275058158481e-07,
+        "finger_error_m": 1.585145702198698e-09,
+        "duration_s": 1.7719999999999998,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "return_home",
+      "start_s": 23.7960000000061,
+      "end_s": 25.568000000008265,
+      "command": [
+        0.0,
+        0.8,
+        -0.7,
+        0.0,
+        0.3,
+        0.0
+      ],
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 7.45561723025645e-07,
+        "finger_error_m": 1.8354156181010772e-09,
+        "duration_s": 1.7719999999999998,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "gripper_close",
+      "start_s": 25.568000000008265,
+      "end_s": 29.200000000012704,
+      "command": 0.0,
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 6.552727123727645e-11,
+        "finger_error_m": 8.319323645601656e-08,
+        "duration_s": 3.632,
+        "peak_penetration_m": 5.830468822600125e-08
+      }
+    },
+    {
+      "phase": "gripper_open",
+      "start_s": 29.800000000013437,
+      "end_s": 33.432000000012785,
+      "command": 0.07,
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 6.545658549241669e-11,
+        "finger_error_m": 1.797173521111972e-15,
+        "duration_s": 3.632,
+        "peak_penetration_m": 8.118305374521853e-10
+      }
+    },
+    {
+      "phase": "gripper_half",
+      "start_s": 34.03200000001139,
+      "end_s": 36.023000000006746,
+      "command": 0.035,
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 2.2457426226967088e-10,
+        "finger_error_m": 6.498274141009119e-15,
+        "duration_s": 1.991,
+        "peak_penetration_m": 0.0
+      }
+    },
+    {
+      "phase": "gripper_reopen",
+      "start_s": 36.023000000006746,
+      "end_s": 38.014000000002106,
+      "command": 0.07,
+      "passed": true,
+      "execution": {
+        "status": "succeeded",
+        "reason": "target_reached",
+        "arm_error_rad": 2.24074783347519e-10,
+        "finger_error_m": 6.467049118441537e-15,
+        "duration_s": 1.991,
+        "peak_penetration_m": 0.0
+      }
+    }
+  ],
+  "rejections": [
+    {
+      "case": "joint_outside_limit",
+      "rejected_without_motion": true,
+      "result": {
+        "status": "rejected",
+        "reason": "joint_limit"
+      }
+    },
+    {
+      "case": "joint_nan",
+      "rejected_without_motion": true,
+      "result": {
+        "status": "rejected",
+        "reason": "expected_six_finite_radians"
+      }
+    },
+    {
+      "case": "unsupported_80mm_opening",
+      "rejected_without_motion": true,
+      "result": {
+        "status": "rejected",
+        "reason": "opening_m_must_be_in_0_to_0.07"
+      }
+    }
+  ],
+  "final_pose": {
+    "frame_id": "base",
+    "x": 0.2874530117948989,
+    "y": -1.7665455959196633e-06,
+    "z": 0.3047091223038044,
+    "qx": 2.7789706404849977e-06,
+    "qy": 0.8086162489482697,
+    "qz": -4.971207051687174e-06,
+    "qw": 0.5883364359823344
+  }
+}

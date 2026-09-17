@@ -28,21 +28,15 @@ MODEL_XML = r"""
       <geom type="box" pos="0 .09 .07" size=".08 .01 .07"/>
     </body>
     <body name="gripper" mocap="true" pos="0 0 0.25">
-      <geom name="palm" type="box" pos="0 0 .04" size=".06 .07 .02" mass="0.2" contype="0" conaffinity="0"/>
-      <body name="left_finger" pos="0 .055 0">
-        <joint name="left_slide" type="slide" axis="0 1 0" range="-.03 .03"/>
-        <geom name="left_finger_geom" type="box" pos="0 0 -.035" size=".025 .012 .035" mass="0.03"/>
-      </body>
-      <body name="right_finger" pos="0 -.055 0">
-        <joint name="right_slide" type="slide" axis="0 1 0" range="-.03 .03"/>
-        <geom name="right_finger_geom" type="box" pos="0 0 -.035" size=".025 .012 .035" mass="0.03"/>
-      </body>
+      <geom name="palm" type="box" pos="0 0 0" size=".06 .07 .02" mass="0.2" contype="0" conaffinity="0"/>
+    </body>
+    <body name="left_finger" mocap="true" pos="0 .10 .10">
+      <geom name="left_finger_geom" type="box" size=".025 .012 .05" mass="0.03"/>
+    </body>
+    <body name="right_finger" mocap="true" pos="0 0 .10">
+      <geom name="right_finger_geom" type="box" size=".025 .012 .05" mass="0.03"/>
     </body>
   </worldbody>
-  <actuator>
-    <position name="left_grip" joint="left_slide" kp="2000" ctrlrange="-.03 .03"/>
-    <position name="right_grip" joint="right_slide" kp="2000" ctrlrange="-.03 .03"/>
-  </actuator>
 </mujoco>
 """
 
@@ -50,7 +44,7 @@ MODEL_XML = r"""
 class MujocoRobot:
     """RobotPort implementation backed by a kinematic MuJoCo gripper."""
 
-    def __init__(self, xml: str = MODEL_XML, render: bool = False, xml_path: str | None = None):
+    def __init__(self, xml: str = MODEL_XML, render: bool = False, xml_path: str | None = None, cube_start: tuple[float, float] = (0.30, 0.05)):
         try:
             import mujoco
         except ImportError as exc:
@@ -60,48 +54,77 @@ class MujocoRobot:
         self.data = mujoco.MjData(self.model)
         self.render = render
         self._mocap = self.model.body("gripper").mocapid[0]
-        self._left = self.model.actuator("left_grip").id
-        self._right = self.model.actuator("right_grip").id
-        self.held_object = None
+        self._left_mocap = self.model.body("left_finger").mocapid[0]
+        self._right_mocap = self.model.body("right_finger").mocapid[0]
+        self.gripper_center = [0.0, 0.0, 0.25]
+        self.gripper_opening_m = 0.10
+        self.max_speed_mps = 0.35
+        self.max_opening_speed_mps = 0.20
+        self._set_cube_start(cube_start)
         mujoco.mj_forward(self.model, self.data)
 
     def _step(self, seconds: float = 0.25):
         for _ in range(max(1, int(seconds / self.model.opt.timestep))):
             self.mujoco.mj_step(self.model, self.data)
 
+    def _set_cube_start(self, start: tuple[float, float]):
+        """Set the free body's initial state before the first simulation step."""
+        if len(start) != 2 or not all(-0.5 < value < 0.8 for value in start):
+            raise ValueError("cube_start must be a valid tabletop (x, y) pair")
+        cube_jid = self.model.body("cube").jntadr[0]
+        qpos = self.model.jnt_qposadr[cube_jid]
+        self.data.qpos[qpos:qpos + 3] = [start[0], start[1], .07]
+        self.data.qpos[qpos + 3:qpos + 7] = [1.0, 0.0, 0.0, 0.0]
+        self.data.qvel[:] = 0.0
+
+    def _set_finger_positions(self):
+        half = 0.047 + self.gripper_opening_m / 2.0
+        cx, cy, cz = self.gripper_center
+        self.data.mocap_pos[self._mocap] = [cx, cy, cz]
+        self.data.mocap_pos[self._left_mocap] = [cx, cy + half, cz - .07]
+        self.data.mocap_pos[self._right_mocap] = [cx, cy - half, cz - .07]
+
     def move_to(self, pose: Pose) -> bool:
         if pose.frame_id != "base":
             return False
-        self.data.mocap_pos[self._mocap] = [pose.x, pose.y, pose.z]
-        self._step()
+        target = [pose.x, pose.y, pose.z]
+        current = list(self.gripper_center)
+        distance = sum((target[i] - current[i]) ** 2 for i in range(3)) ** 0.5
+        duration = max(self.model.opt.timestep, distance / self.max_speed_mps)
+        steps = max(1, int(duration / self.model.opt.timestep))
+        for step in range(1, steps + 1):
+            ratio = step / steps
+            self.gripper_center = [current[i] + (target[i] - current[i]) * ratio for i in range(3)]
+            self._set_finger_positions()
+            self.mujoco.mj_step(self.model, self.data)
         return True
 
     def set_gripper(self, opening_m: float) -> bool:
-        # Both joints use +Y. Convert a requested TCP opening to opposing
-        # joint positions around the neutral +/-55 mm finger offsets.
-        half = max(0.0, min(0.03, 0.03 - opening_m / 2.0))
-        self.data.ctrl[self._left] = -half
-        self.data.ctrl[self._right] = half
-        self._step(0.35)
+        target = max(0.0, min(0.10, float(opening_m)))
+        duration = abs(target - self.gripper_opening_m) / self.max_opening_speed_mps
+        steps = max(1, int(duration / self.model.opt.timestep))
+        start = self.gripper_opening_m
+        for step in range(1, steps + 1):
+            self.gripper_opening_m = start + (target - start) * step / steps
+            self._set_finger_positions()
+            self.mujoco.mj_step(self.model, self.data)
         return True
 
     def grasp(self) -> bool:
         """Return true only when both fingers physically contact the cube."""
         self._step(0.1)
         cube_geom = self.model.geom("cube_geom").id
-        finger_geoms = {self.model.geom("left_finger_geom").id, self.model.geom("right_finger_geom").id}
-        contacts = {int(self.data.contact[i].geom1) for i in range(self.data.ncon)} | {int(self.data.contact[i].geom2) for i in range(self.data.ncon)}
-        return cube_geom in contacts and bool(finger_geoms & contacts)
+        left_geom = self.model.geom("left_finger_geom").id
+        right_geom = self.model.geom("right_finger_geom").id
+        pairs = {frozenset((int(self.data.contact[i].geom1), int(self.data.contact[i].geom2))) for i in range(self.data.ncon)}
+        return frozenset((cube_geom, left_geom)) in pairs and frozenset((cube_geom, right_geom)) in pairs
 
     def release(self) -> bool:
         return self.set_gripper(0.10)
 
     def diagnostics(self) -> dict:
         joints = []
-        for name in ("left_slide", "right_slide"):
-            joint = self.model.joint(name)
-            joints.append({"name": name, "axis": tuple(float(v) for v in joint.axis), "range": tuple(float(v) for v in joint.range)})
-        return {"joints": joints, "gripper_opening_limits_m": [0.0, 0.10]}
+        return {"joints": joints, "gripper_axis": (0.0, 1.0, 0.0), "gripper_opening_limits_m": [0.0, 0.10], "motion_limit_mps": self.max_speed_mps}
 
     def render_camera(self, width: int = 320, height: int = 240):
         """Render RGB pixels only; this does not expose simulator object poses."""
@@ -113,7 +136,7 @@ class MujocoRobot:
 
     def get_state(self) -> dict:
         cube = self.data.body("cube").xpos.copy()
-        return {"cube_position": tuple(float(v) for v in cube), "time": float(self.data.time), "held_object": self.held_object}
+        return {"cube_position": tuple(float(v) for v in cube), "time": float(self.data.time)}
 
     def cancel(self) -> None:
         self.set_gripper(0.08)

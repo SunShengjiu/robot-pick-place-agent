@@ -11,8 +11,17 @@ def main(argv=None):
     sub.add_parser("observe")
     plan = sub.add_parser("plan"); plan.add_argument("instruction")
     run = sub.add_parser("run"); run.add_argument("instruction")
+    piper = sub.add_parser("piper-m1", help="完整 PiPER 六轴与夹爪运动验收（非抓放/CaP）")
+    piper.add_argument("--output", default="artifacts/piper_m1")
+    piper.add_argument("--no-video", action="store_true", help="仅运行物理与记录检查")
     sim = sub.add_parser("simulate"); sim.add_argument("instruction", nargs="?", default="把红色方块放进蓝色盒子"); sim.add_argument("--xml", help="可选的 PiPER/夹爪 MJCF 文件"); sim.add_argument("--observation", choices=("state", "camera"), default="state", help="观测来源")
     args = parser.parse_args(argv)
+    if args.command == "piper-m1":
+        from pathlib import Path
+        from robot_pick_place_agent.adapters.simulation.piper_m1 import run_m1
+        result = run_m1(Path(args.output), video=not args.no_video)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if result["passed"] else 1
     app = Application()
     if args.command == "observe":
         print(json.dumps(asdict(app.observe()), ensure_ascii=False, default=str, indent=2))

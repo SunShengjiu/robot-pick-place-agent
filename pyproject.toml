@@ -11,12 +11,16 @@ dependencies = ["PyYAML>=6.0"]
 
 [project.optional-dependencies]
 simulation = ["mujoco>=3.2,<4"]
+simulation-media = ["mujoco>=3.2,<4", "Pillow>=9"]
 
 [project.scripts]
 robot-agent = "robot_pick_place_agent.cli.main:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+robot_pick_place_agent = ["assets/piper/source.json", "assets/piper/upstream/*", "assets/piper/meshes/*.STL"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

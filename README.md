@@ -4,7 +4,13 @@
 
 ## 当前状态
 
-项目已包含可运行的 mock CLI，并提供可选 MuJoCo 物理验证闭环；模型集成、ROS/PiPER 真机抓放仍在后续阶段。
+当前主演示为 **M1：完整 PiPER 六轴机械臂＋末端夹爪的 MuJoCo 运动验收**。
+已接入官方 humble 固定版本模型，完成逐关节运动、返回指定姿态、夹爪开合。
+模型按当前 URDF 适配，具体硬件/固件匹配仍待确认。IK、整臂物理抓放、实际模型 API＋CaP、相机与真机迁移尚未完成。
+
+[完整机械臂截图](artifacts/piper_m1/home_hold.png) ·
+[连续运动视频](artifacts/piper_m1/piper_m1_continuous.mp4) ·
+[M1 核对报告与关节映射](docs/piper-m1.md) · [来源与版本](UPSTREAM.md)
 
 ## 首个部署目标
 
@@ -30,30 +36,39 @@
 
 ## 实施顺序
 
-1. 核心数据类型、接口、模拟机器人和最小 CLI。
-2. PiPER / ROS 桥接与固定坐标抓取放置。
-3. D435i、相机标定、检测和视觉抓放。
-4. 模型 API、高层工具调用和真实结果检查。
-5. 异常处理、批量测试与可复现部署说明。
+1. M1：官方 PiPER＋夹爪模型、逐关节与开合验收（已完成仿真验证）。
+2. M2：已知 state 坐标下整臂 IK、避碰和物理抓放，记录成功/失败证据。
+3. M3：实际模型 API＋CaP，通过受控技能接口驱动同一 PiPER 流程。
+4. M4：相机观测、PiPER ROS 2 / D435i 适配与现场标定验收。
 
 ## 本地运行
 
 ```bash
+python3 -m pip install --user 'setuptools>=68'
+python3 -m pip install -e '.[simulation-media]'
+MUJOCO_GL=egl robot-agent piper-m1  # 生成完整机械臂视频，需要 ffmpeg
+robot-agent piper-m1 --no-video --output artifacts/piper_m1_headless
 PYTHONPATH=src python3 -m pytest -q
+```
+
+现有 mock 与早期接触测试入口继续保留，仅用于各自的流程/接触检查：
+
+```bash
 PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main run "把红色方块放进蓝色盒子"
 PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main plan "把红色方块放进蓝色盒子"
-python3 -m pip install -e '.[simulation]'  # 需要 MuJoCo 时
-PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main simulate
+PYTHONPATH=src python3 -m robot_pick_place_agent.cli.main simulate  # 旧简化夹爪，不是 PiPER
 ```
 
 第一轮正确性约定：`run` 的退出码为 `0=succeeded`、`1=failed`、`2=uncertain`；规划不明确、否定或不支持的指令不会调用机器人。结果 JSON 会区分 `mock_flow` 与设备反馈，Mock 流程成功不代表物理抓放成功。
 
-MuJoCo 仿真会返回关节方向/限位、接触、抬升和最终落点证据。只有方块由接触夹持并抬离桌面后，`success` 才会为真；固定绑定或直接改写方块位姿不计入验证。
+PiPER M1 返回明确的里程碑范围和关节执行证据，不声称抓放或 CaP 成功。
+后续 M2 最终成功必须同时验证夹持、持续抬升、运输、释放、夹爪撤离和物体稳定落入容器；固定绑定或执行中改写物体位姿不计入验证。
 
 初期只建立有实际内容的模块；完整目录规划见架构文档。
 
 ## 上游与许可证
 
-计划集成 PiPER ROS、RealSense ROS、GroundingDINO，并参考 Code as Policies 的提示和 API 组织方式。实际接入时记录上游版本、许可和修改范围。
+已导入 PiPER ROS humble 的官方模型和网格，固定提交及适配内容见 [UPSTREAM.md](UPSTREAM.md)。
+后续接入 RealSense ROS、相机观测和实际模型 API，参考 Code as Policies 的提示、任务程序与技能 API 组织。
 
 项目开源许可证待定。

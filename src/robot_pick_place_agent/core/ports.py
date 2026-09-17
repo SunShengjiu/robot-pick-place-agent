@@ -9,6 +9,12 @@ class RobotPort(Protocol):
     def cancel(self) -> None: ...
 
 
+class JointRobotPort(RobotPort, Protocol):
+    """Optional arm commissioning capability; SI radians in declared joint order."""
+
+    def move_joints(self, positions_rad: tuple[float, ...]) -> bool: ...
+
+
 class SceneProviderPort(Protocol):
     def observe(self) -> SceneSnapshot: ...
 

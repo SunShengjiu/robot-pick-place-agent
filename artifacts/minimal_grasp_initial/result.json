@@ -1,0 +1,30 @@
+{
+  "passed": false,
+  "checks": {
+    "initially_stationary": true,
+    "no_closure_launch": true,
+    "sustained_lift_at_least_5cm": true,
+    "bilateral_effective_contact_through_transport": true,
+    "horizontal_transport_at_least_10cm": true,
+    "relative_position_drift_below_2mm": false,
+    "penetration_below_1mm": false,
+    "side_contact_without_tip_support": false,
+    "no_table_or_palm_support_in_air": true,
+    "released_freefall": true,
+    "stable_after_fall": true
+  },
+  "minimum_sustained_lift_m": 0.07700779495268721,
+  "horizontal_transport_m": 0.12000003001292885,
+  "max_relative_drift_m": 0.002004727451233625,
+  "max_penetration_m": 0.0023183367554233253,
+  "freefall_acceleration_mps2": -9.809999999996709,
+  "hold_durations_s": {
+    "lift_hold": 0.6,
+    "transport_hold": 0.6
+  },
+  "minimum_tip_clearance_m": -1.8735013540549517e-16,
+  "minimum_normal_force_N": {
+    "left": 2.3869826002249726,
+    "right": 2.3869825976001735
+  }
+}
