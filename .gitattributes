@@ -1,0 +1,12 @@
+# Vendored upstream files are byte-preserved. tools/vendor_piper.py performs
+# LF canonicalization only while hashing text; it never rewrites the source blob.
+src/robot_pick_place_agent/assets/piper/upstream/** -text
+src/robot_pick_place_agent/assets/piper/meshes/** -text
+src/robot_pick_place_agent/assets/piper/source.json text eol=lf
+
+# Evidence media must remain binary across checkouts.
+artifacts/**/*.mp4 binary
+artifacts/**/*.png binary
+
+# Human-readable traces use stable LF output.
+artifacts/**/*.csv text eol=lf

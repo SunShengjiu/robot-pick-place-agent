@@ -245,6 +245,9 @@ class PiperMujocoRobot:
         self.target = target.copy()
         if not self.hold(.35):
             return False
+        if self._cancel_requested.is_set():
+            self._finish_cancelled()
+            return False
         peak_penetration = max(peak_penetration, max((-c.dist for c in self.data.contact), default=0))
         error = np.abs(self.data.qpos[self._qadr] - target)
         reached = bool(np.max(error[:6]) < .01 and np.max(error[6:]) < .0005
